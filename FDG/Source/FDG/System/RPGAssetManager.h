@@ -50,20 +50,26 @@ public:
 	// Logs all assets currently loaded and tracked by the asset manager.
 	static UE_API void DumpLoadedAssets();
 
-	UE_API const URPGGameData& GetGameData();
+	UE_API const URPGGameData* GetGameData();
 	UE_API const URPGPawnData* GetDefaultPawnData() const;
 
 protected:
 	template <typename GameDataClass>
-	const GameDataClass& GetOrLoadTypedGameData(const TSoftObjectPtr<GameDataClass>& DataPath)
+	const GameDataClass* GetOrLoadTypedGameData(const TSoftObjectPtr<GameDataClass>& DataPath)
 	{
 		if (TObjectPtr<UPrimaryDataAsset> const * pResult = GameDataMap.Find(GameDataClass::StaticClass()))
 		{
-			return *CastChecked<GameDataClass>(*pResult);
+			return CastChecked<GameDataClass>(*pResult);
 		}
 
 		// Does a blocking load if needed
-		return *CastChecked<const GameDataClass>(LoadGameDataOfClass(GameDataClass::StaticClass(), DataPath, GameDataClass::StaticClass()->GetFName()));
+		UPrimaryDataAsset* LoadedAsset = LoadGameDataOfClass(GameDataClass::StaticClass(), DataPath, GameDataClass::StaticClass()->GetFName());
+		if (!LoadedAsset)
+		{
+			return nullptr;
+		}
+
+		return CastChecked<const GameDataClass>(LoadedAsset);
 	}
 
 

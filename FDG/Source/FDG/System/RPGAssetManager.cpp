@@ -134,14 +134,40 @@ void URPGAssetManager::InitializeGameplayCueManager()
 }
 
 
-const URPGGameData& URPGAssetManager::GetGameData()
+const URPGGameData* URPGAssetManager::GetGameData()
 {
 	return GetOrLoadTypedGameData<URPGGameData>(RPGGameDataPath);
 }
 
 const URPGPawnData* URPGAssetManager::GetDefaultPawnData() const
 {
-	return GetAsset(DefaultPawnData);
+	UE_LOG(LogRPG, Log, TEXT("URPGAssetManager::GetDefaultPawnData - Path: %s, IsNull: %s"),
+		*DefaultPawnData.ToString(), DefaultPawnData.IsNull() ? TEXT("true") : TEXT("false"));
+
+	const URPGPawnData* Result = GetAsset(DefaultPawnData);
+
+	if (!Result && !DefaultPawnData.IsNull())
+	{
+		// GameFeature plugin content may not be mounted yet via AssetManager.
+		// Try direct synchronous load as a fallback.
+		UE_LOG(LogRPG, Log, TEXT("URPGAssetManager::GetDefaultPawnData - AssetManager load failed, trying LoadSynchronous fallback..."));
+		Result = DefaultPawnData.LoadSynchronous();
+		if (Result)
+		{
+			UE_LOG(LogRPG, Log, TEXT("URPGAssetManager::GetDefaultPawnData - LoadSynchronous succeeded: %s"), *GetNameSafe(Result));
+		}
+		else
+		{
+			UE_LOG(LogRPG, Warning, TEXT("URPGAssetManager::GetDefaultPawnData - Both load methods FAILED! Path: %s. "
+				"Check: 1) Asset exists at this path 2) RPGCore GameFeature plugin is mounted"), *DefaultPawnData.ToString());
+		}
+	}
+	else if (Result)
+	{
+		UE_LOG(LogRPG, Log, TEXT("URPGAssetManager::GetDefaultPawnData - Loaded: %s"), *GetNameSafe(Result));
+	}
+
+	return Result;
 }
 
 UPrimaryDataAsset* URPGAssetManager::LoadGameDataOfClass(TSubclassOf<UPrimaryDataAsset> DataClass, const TSoftObjectPtr<UPrimaryDataAsset>& DataClassPath, FPrimaryAssetType PrimaryAssetType)
@@ -264,7 +290,13 @@ void URPGAssetManager::PreBeginPIE(bool bStartSimulate)
 		const bool bAllowInPIE = true;
 		SlowTask.MakeDialog(bShowCancelButton, bAllowInPIE);
 
-		const URPGGameData& LocalGameDataCommon = GetGameData();
+		const URPGGameData* LocalGameDataCommon = GetGameData();
+
+		if (!LocalGameDataCommon)
+		{
+			UE_LOG(LogRPG, Warning, TEXT("PreBeginPIE: Failed to load RPGGameData, skipping PIE preloading."));
+			return;
+		}
 
 		// Intentionally after GetGameData to avoid counting GameData time in this timer
 		SCOPE_LOG_TIME_IN_SECONDS(TEXT("PreBeginPIE asset preloading complete"), nullptr);

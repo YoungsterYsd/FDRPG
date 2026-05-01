@@ -16,7 +16,7 @@ class UObject;
  *
  *	Non-mutable data asset that contains global game data.
  */
-UCLASS(MinimalAPI, BlueprintType, Const, Meta = (DisplayName = "RPG Game Data", ShortTooltip = "Data asset containing global game data."))
+UCLASS(MinimalAPI, BlueprintType, Meta = (DisplayName = "RPG Game Data", ShortTooltip = "Data asset containing global game data."))
 class URPGGameData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
@@ -26,7 +26,7 @@ public:
 	UE_API URPGGameData();
 
 	// Returns the loaded game data.
-	static UE_API const URPGGameData& Get();
+	static UE_API const URPGGameData* Get();
 
 public:
 

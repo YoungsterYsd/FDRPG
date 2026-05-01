@@ -8,7 +8,7 @@ public class FDG : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "GameplayAbilities", "GameplayTags", "GameplayTasks", "DeveloperSettings" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "GameplayAbilities", "GameplayTags", "GameplayTasks", "DeveloperSettings", "UMG", "Slate", "SlateCore", "GameFeatures", "ModularGameplay", "ModularGameplayActors", "CommonUI", "CommonUser", "CommonGame", "CommonLoadingScreen", "GameplayMessageRuntime", "UIExtension", "AsyncMixin", "GameSettings", "GameSubtitles", "ControlFlows", "DataRegistry", "AnimationWarpingRuntime", "Niagara" });
 
 		// RPGGAME_API 全局映射：所有从 Lyra 提取的 Skill 代码使用 RPGGAME_API，
 		// 通过编译器定义映射到本项目的 FDG_API，无需每个文件手动 include

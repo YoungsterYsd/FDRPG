@@ -40,9 +40,15 @@ namespace RPGGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Block, "InputTag.Block", "Block input.");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_WeaponSwitch, "InputTag.WeaponSwitch", "Weapon switch input.");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Interact, "InputTag.Interact", "Interact input.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_NormalAttack, "InputTag.NormalAttack", "Normal attack input.");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Skill1, "InputTag.Skill1", "Skill 1 input.");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Skill2, "InputTag.Skill2", "Skill 2 input.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Skill3, "InputTag.Skill3", "Skill 3 input.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Skill4, "InputTag.Skill4", "Skill 4 input.");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Ultimate, "InputTag.Ultimate", "Ultimate input.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_MouseLeftClick, "InputTag.MouseLeftClick", "Mouse left click for UI interaction and backup action.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_MouseRightClick, "InputTag.MouseRightClick", "Mouse right click for UI interaction and backup action.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_MouseMove, "InputTag.MouseMove", "Mouse movement for cursor tracking and backup look.");
 
 	//=====================================================================
 	// InitState - 初始化状态机

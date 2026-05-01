@@ -4,4 +4,6 @@
 
 URPGPawnData::URPGPawnData()
 {
+	PawnClass = nullptr;
+	TagRelationshipMapping = nullptr;
 }

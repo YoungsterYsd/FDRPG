@@ -9,7 +9,7 @@ URPGGameData::URPGGameData()
 {
 }
 
-const URPGGameData& URPGGameData::URPGGameData::Get()
+const URPGGameData* URPGGameData::URPGGameData::Get()
 {
 	return URPGAssetManager::Get().GetGameData();
 }

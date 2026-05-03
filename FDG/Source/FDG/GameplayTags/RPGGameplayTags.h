@@ -105,4 +105,31 @@ namespace RPGGameplayTags
 	// RPG - 免疫/无敌帧
 	//=====================================================================
 	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(RPG_Immunity_Dash);
+
+	//=====================================================================
+	// Attribute - 属性标记
+	//=====================================================================
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Health);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Energy);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Attack);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Defense);
+
+	//=====================================================================
+	// Status - 战斗状态（P2 补充）
+	//=====================================================================
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Invulnerable);
+
+	//=====================================================================
+	// Damage - 伤害类型
+	//=====================================================================
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Damage_Physical);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Damage_Magical);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Damage_True);
+
+	//=====================================================================
+	// Cooldown - 冷却标记
+	//=====================================================================
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Attack);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Skill1);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Skill2);
 };

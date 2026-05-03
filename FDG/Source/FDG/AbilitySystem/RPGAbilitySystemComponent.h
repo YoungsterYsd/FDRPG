@@ -60,6 +60,17 @@ public:
 	// 获取当前按住的第一个 InputTag
 	FGameplayTag GetFirstPressedInputTag() const;
 
+	// ─── 死亡相关 ───
+
+	// 检查角色是否已死亡
+	bool IsDead() const;
+
+	// 通知死亡开始
+	void OnDeathStarted();
+
+	// 通知死亡结束
+	void OnDeathFinished();
+
 private:
 
 	// 本帧按下输入的能力 Spec 句柄

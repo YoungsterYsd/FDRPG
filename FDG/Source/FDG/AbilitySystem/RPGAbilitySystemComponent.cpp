@@ -77,12 +77,12 @@ void URPGAbilitySystemComponent::CancelAbilitiesByFunc(
 			continue;
 		}
 
-		if (WithTags && !AbilitySpec.Ability->AbilityTags.HasAll(*WithTags))
+		if (WithTags && !AbilitySpec.Ability->GetAssetTags().HasAll(*WithTags))
 		{
 			continue;
 		}
 
-		if (WithoutTags && AbilitySpec.Ability->AbilityTags.HasAny(*WithoutTags))
+		if (WithoutTags && AbilitySpec.Ability->GetAssetTags().HasAny(*WithoutTags))
 		{
 			continue;
 		}
@@ -241,4 +241,23 @@ FGameplayTag URPGAbilitySystemComponent::GetFirstPressedInputTag() const
 		}
 	}
 	return FGameplayTag();
+}
+
+bool URPGAbilitySystemComponent::IsDead() const
+{
+	return HasMatchingGameplayTag(RPGGameplayTags::Status_Death_Dying) ||
+		   HasMatchingGameplayTag(RPGGameplayTags::Status_Death_Dead);
+}
+
+void URPGAbilitySystemComponent::OnDeathStarted()
+{
+	// 取消所有非死亡 Ability
+	CancelAbilitiesByFunc([](const URPGGameplayAbility* Ability, FGameplayAbilitySpecHandle)
+	{
+		return !Ability->GetSurvivesDeath();
+	});
+}
+
+void URPGAbilitySystemComponent::OnDeathFinished()
+{
 }

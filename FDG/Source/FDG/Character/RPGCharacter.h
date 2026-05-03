@@ -75,6 +75,18 @@ protected:
 	// Handle death (P2 full implementation, P1 just logs)
 	virtual void OnDeath();
 
+	// Called when the death process starts (P2)
+	UFUNCTION(BlueprintCallable, Category = "RPG|Character")
+	virtual void OnDeathStarted();
+
+	// Called when the death process finishes (P2)
+	UFUNCTION(BlueprintCallable, Category = "RPG|Character")
+	virtual void OnDeathFinished();
+
+	// Reset character for respawn (P8 settlement phase)
+	UFUNCTION(BlueprintCallable, Category = "RPG|Character")
+	virtual void ResetCharacter();
+
 	// Called when movement mode changes
 	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode = 0) override;
 

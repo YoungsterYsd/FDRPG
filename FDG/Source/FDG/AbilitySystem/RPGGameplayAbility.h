@@ -70,6 +70,9 @@ public:
 	// Returns the input tag associated with this ability
 	FGameplayTag GetAbilityInputTag() const { return InputTag; }
 
+	// Returns whether this ability survives death
+	bool GetSurvivesDeath() const { return bSurvivesDeath; }
+
 protected:
 
 	// Policy that determines how the ability is activated with respect to input

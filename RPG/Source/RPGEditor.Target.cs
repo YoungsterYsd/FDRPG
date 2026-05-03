@@ -3,13 +3,13 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class FDGEditorTarget : TargetRules
+public class RPGEditorTarget : TargetRules
 {
-	public FDGEditorTarget( TargetInfo Target) : base(Target)
+	public RPGEditorTarget( TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V6;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_7;
-		ExtraModuleNames.Add("FDG");
+		ExtraModuleNames.Add("RPG");
 	}
 }

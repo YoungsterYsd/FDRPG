@@ -246,6 +246,61 @@ void ARPGCharacter::OnDeath()
 	}
 }
 
+void ARPGCharacter::OnDeathStarted()
+{
+	UE_LOG(LogRPG, Log, TEXT("ARPGCharacter::OnDeathStarted - %s"), *GetName());
+
+	// Disable collision on the capsule
+	if (UCapsuleComponent* Capsule = GetCapsuleComponent())
+	{
+		Capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
+	// Disable movement
+	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
+	{
+		MoveComp->StopMovementImmediately();
+		MoveComp->DisableMovement();
+	}
+}
+
+void ARPGCharacter::OnDeathFinished()
+{
+	UE_LOG(LogRPG, Log, TEXT("ARPGCharacter::OnDeathFinished - %s"), *GetName());
+
+	// Hide the character and set lifespan for cleanup
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+	SetLifeSpan(5.0f);
+}
+
+void ARPGCharacter::ResetCharacter()
+{
+	UE_LOG(LogRPG, Log, TEXT("ARPGCharacter::ResetCharacter - %s"), *GetName());
+
+	// Reset health and energy (P8 will implement full respawn)
+	if (URPGAbilitySystemComponent* ASC = GetRPGAbilitySystemComponent())
+	{
+		ASC->RemoveLooseGameplayTag(RPGGameplayTags::Status_Death_Dying);
+		ASC->RemoveLooseGameplayTag(RPGGameplayTags::Status_Death_Dead);
+	}
+
+	// Re-enable collision and visibility
+	SetActorHiddenInGame(false);
+	SetActorEnableCollision(true);
+
+	if (UCapsuleComponent* Capsule = GetCapsuleComponent())
+	{
+		Capsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
+
+	// Re-enable movement
+	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
+	{
+		MoveComp->SetMovementMode(MOVE_Walking);
+	}
+}
+
 void ARPGCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
 {
 	Super::OnMovementModeChanged(PrevMovementMode, PreviousCustomMode);

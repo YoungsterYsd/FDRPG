@@ -88,8 +88,11 @@ protected:
 	// Called when the ability system is initialized
 	void OnAbilitySystemInitialized();
 
+public:
 	// Called when the ability system is uninitialized (called by Character::Reset)
 	void OnAbilitySystemUninitialized();
+
+protected:
 
 	// The current initialization state
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "InitState")

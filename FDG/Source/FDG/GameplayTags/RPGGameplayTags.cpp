@@ -103,6 +103,33 @@ namespace RPGGameplayTags
 	//=====================================================================
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(RPG_Immunity_Dash, "RPG.Immunity.Dash", "Target is immune during dash/dodge (i-frames).");
 
+	//=====================================================================
+	// Attribute - 属性标记
+	//=====================================================================
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Health, "RPG.Attribute.Health", "Health attribute tag.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Energy, "RPG.Attribute.Energy", "Energy attribute tag.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Attack, "RPG.Attribute.Attack", "Attack attribute tag.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Defense, "RPG.Attribute.Defense", "Defense attribute tag.");
+
+	//=====================================================================
+	// Status - 战斗状态（P2 补充）
+	//=====================================================================
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Status_Invulnerable, "Status.Invulnerable", "Target is invulnerable to damage.");
+
+	//=====================================================================
+	// Damage - 伤害类型
+	//=====================================================================
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Damage_Physical, "RPG.Damage.Physical", "Physical damage type.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Damage_Magical, "RPG.Damage.Magical", "Magical damage type.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Damage_True, "RPG.Damage.True", "True damage (ignores defense).");
+
+	//=====================================================================
+	// Cooldown - 冷却标记
+	//=====================================================================
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Cooldown_Attack, "RPG.Cooldown.Attack", "Attack cooldown.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Cooldown_Skill1, "RPG.Cooldown.Skill1", "Skill 1 cooldown.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Cooldown_Skill2, "RPG.Cooldown.Skill2", "Skill 2 cooldown.");
+
 	// Unreal Movement Modes
 	const TMap<uint8, FGameplayTag> MovementModeTagMap =
 	{

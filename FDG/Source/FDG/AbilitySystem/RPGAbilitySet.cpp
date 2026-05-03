@@ -143,7 +143,7 @@ void URPGAbilitySet::GiveToAbilitySystem(URPGAbilitySystemComponent* ASC, FRPGAb
 		}
 	}
 
-	// Grant attribute sets
+	// Grant attribute sets (skip if already registered to avoid duplicates)
 	for (int32 SetIndex = 0; SetIndex < AttributeSets.Num(); ++SetIndex)
 	{
 		const TSubclassOf<UAttributeSet>& SetClass = AttributeSets[SetIndex];
@@ -153,14 +153,29 @@ void URPGAbilitySet::GiveToAbilitySystem(URPGAbilitySystemComponent* ASC, FRPGAb
 			continue;
 		}
 
-		UAttributeSet* NewSet = NewObject<UAttributeSet>(ASC->GetOwner(), SetClass);
-		if (NewSet)
+		// 检查是否已存在同类型的 AttributeSet（避免 PlayerState 默认子对象重复注册）
+		bool bAlreadyExists = false;
+		for (UAttributeSet* ExistingSet : ASC->GetSpawnedAttributes())
 		{
-			ASC->AddAttributeSetSubobject(NewSet);
-
-			if (OutGrantedHandles)
+			if (ExistingSet && ExistingSet->IsA(SetClass))
 			{
-				OutGrantedHandles->AddAttributeSet(NewSet);
+				bAlreadyExists = true;
+				UE_LOG(LogRPG, Verbose, TEXT("URPGAbilitySet::GiveToAbilitySystem - AttributeSet '%s' already exists, skipping."), *GetNameSafe(ExistingSet));
+				break;
+			}
+		}
+
+		if (!bAlreadyExists)
+		{
+			UAttributeSet* NewSet = NewObject<UAttributeSet>(ASC->GetOwner(), SetClass);
+			if (NewSet)
+			{
+				ASC->AddAttributeSetSubobject(NewSet);
+
+				if (OutGrantedHandles)
+				{
+					OutGrantedHandles->AddAttributeSet(NewSet);
+				}
 			}
 		}
 	}

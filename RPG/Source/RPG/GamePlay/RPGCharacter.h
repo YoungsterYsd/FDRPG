@@ -7,7 +7,7 @@
 #include "AbilitySystemInterface.h"
 #include "GameplayTagContainer.h"
 #include "InputAction.h"
-#include "../AbilitySystem/RPGAbilitySet.h"
+#include "../AbilitySystem/AbilitySet/RPGAbilitySet.h"
 #include "RPGCharacter.generated.h"
 
 class URPGAbilitySystemComponent;
@@ -62,32 +62,23 @@ protected:
 	UPROPERTY()
 	mutable URPGAbilitySystemComponent* CachedASC;
 
-	/** 授予测试能力（GA_TestA）并配置 InputTag */
-	void GiveTestAbility();
-
+public:
 	// ========================================================================
-	// AbilitySet 支持 - 数据驱动的能力授予
+	// Character Config 支持 - 角色配置系统
 	// ========================================================================
 
-	/** 
-	 * 默认授予的 AbilitySet 列表
-	 * 在 BeginPlay 中自动授予（仅在 Server/单机有效）
-	 * 
-	 * 使用方式：
-	 *   1. 创建 URPGAbilitySet 数据资产（Content Browser → Data Asset → URPGAbilitySet）
-	 *   2. 在资产中配置要授予的 Abilities、GameplayEffects、AttributeSets
-	 *   3. 将此资产添加到此数组
-	 *   4. 无需修改 C++ 代码，Play 时自动授予
-	 */
-	UPROPERTY(EditDefaultsOnly, Category = "Ability|Ability Sets")
-	TArray<TObjectPtr<URPGAbilitySet>> DefaultAbilitySets;
+	/** CharacterID - 用于在 CharacterConfig 中查找对应的技能和属性配置 */
+	UPROPERTY(EditDefaultsOnly, Category = "Config")
+	FName CharacterID;
 
-	/** 记录 DefaultAbilitySets 授予后的 Handles，用于 EndPlay 时撤销 */
-	TArray<FRPGAbilitySet_GrantedHandles> DefaultAbilitySetHandles;
+	/** 获取 CharacterID */
+	UFUNCTION(BlueprintCallable, Category = "Config")
+	FName GetCharacterID() const { return CharacterID; }
 
-	/** 授予所有 DefaultAbilitySets */
-	void GiveDefaultAbilitySets();
+	/** 设置 CharacterID */
+	UFUNCTION(BlueprintCallable, Category = "Config")
+	void SetCharacterID(FName NewID) { CharacterID = NewID; }
 
-	/** 撤销所有 DefaultAbilitySets */
-	void RemoveDefaultAbilitySets();
+	/** 根据 CharacterID 初始化技能和属性（从 CharacterConfig 读取配置） */
+	void InitFromCharacterConfig();
 };

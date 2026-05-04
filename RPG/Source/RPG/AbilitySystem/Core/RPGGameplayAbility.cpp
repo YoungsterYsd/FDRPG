@@ -1,6 +1,6 @@
 #include "RPGGameplayAbility.h"
 #include "RPGAbilitySystemComponent.h"
-#include "../System/RPGLogChannels.h"
+#include "../../System/RPGLogChannels.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RPGGameplayAbility)
 

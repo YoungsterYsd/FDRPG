@@ -1,7 +1,7 @@
 #include "RPGAbilitySystemComponent.h"
 #include "RPGGameplayAbility.h"
 #include "RPGAbilityTagRelationshipMapping.h"
-#include "../System/RPGLogChannels.h"
+#include "../../System/RPGLogChannels.h"
 #include "Engine/World.h"
 #include "GameFramework/Pawn.h"
 
@@ -332,15 +332,11 @@ void URPGAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& Inp
 // ============================================================================
 void URPGAbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool bGamePaused)
 {
-	UE_LOG(LogRPG, Display, TEXT("ProcessAbilityInput: Starting... Pressed=%d, Released=%d, Held=%d"), 
-		InputPressedSpecHandles.Num(), InputReleasedSpecHandles.Num(), InputHeldSpecHandles.Num());
-
 	// ── 1. 检查输入阻断 ──
 	// 如果 ASC 拥有 "Gameplay.AbilityInputBlocked" 标签（如眩晕、过场动画），
 	// 则清空所有输入缓存并跳过处理
 	if (HasMatchingGameplayTag(TAG_Gameplay_AbilityInputBlocked))
 	{
-		UE_LOG(LogRPG, Warning, TEXT("ProcessAbilityInput: Input BLOCKED by tag!"));
 		ClearAbilityInput();
 		return;
 	}
@@ -350,8 +346,6 @@ void URPGAbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool bGame
 	AbilitiesToActivate.Reset();
 
 	// ── 2. 处理持续按住的输入 (WhileInputActive) ──
-	UE_LOG(LogRPG, Display, TEXT("ProcessAbilityInput: Processing %d Held inputs..."), InputHeldSpecHandles.Num());
-	
 	for (const FGameplayAbilitySpecHandle& SpecHandle : InputHeldSpecHandles)
 	{
 		if (const FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(SpecHandle))
@@ -361,7 +355,6 @@ void URPGAbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool bGame
 				const URPGGameplayAbility* RPGAbilityCDO = Cast<URPGGameplayAbility>(AbilitySpec->Ability);
 				if (RPGAbilityCDO && RPGAbilityCDO->GetActivationPolicy() == ERPGAbilityActivationPolicy::WhileInputActive)
 				{
-					UE_LOG(LogRPG, Display, TEXT("ProcessAbilityInput: Adding Held ability [%s] to activation list"), *GetNameSafe(AbilitySpec->Ability));
 					AbilitiesToActivate.AddUnique(AbilitySpec->Handle);
 				}
 			}
@@ -369,8 +362,6 @@ void URPGAbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool bGame
 	}
 
 	// ── 3. 处理按下的输入 (OnInputTriggered + InputPressed 事件) ──
-	UE_LOG(LogRPG, Display, TEXT("ProcessAbilityInput: Processing %d Pressed inputs..."), InputPressedSpecHandles.Num());
-	
 	for (const FGameplayAbilitySpecHandle& SpecHandle : InputPressedSpecHandles)
 	{
 		if (FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(SpecHandle))
@@ -381,7 +372,6 @@ void URPGAbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool bGame
 
 				if (AbilitySpec->IsActive())
 				{
-					UE_LOG(LogRPG, Display, TEXT("ProcessAbilityInput: Ability [%s] already active, sending InputPressed event"), *GetNameSafe(AbilitySpec->Ability));
 					// 能力已激活，传递 InputPressed 事件（如连击、蓄力等）
 					AbilitySpecInputPressed(*AbilitySpec);
 				}
@@ -392,7 +382,6 @@ void URPGAbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool bGame
 
 					if (RPGAbilityCDO && RPGAbilityCDO->GetActivationPolicy() == ERPGAbilityActivationPolicy::OnInputTriggered)
 					{
-						UE_LOG(LogRPG, Display, TEXT("ProcessAbilityInput: Adding Pressed ability [%s] to activation list"), *GetNameSafe(AbilitySpec->Ability));
 						AbilitiesToActivate.AddUnique(AbilitySpec->Handle);
 					}
 				}
@@ -401,18 +390,12 @@ void URPGAbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool bGame
 	}
 
 	// ── 4. 批量激活 ──
-	UE_LOG(LogRPG, Display, TEXT("ProcessAbilityInput: Activating %d abilities..."), AbilitiesToActivate.Num());
-	
 	for (const FGameplayAbilitySpecHandle& AbilitySpecHandle : AbilitiesToActivate)
 	{
-		UE_LOG(LogRPG, Display, TEXT("ProcessAbilityInput: Calling TryActivateAbility..."));
-		bool bActivated = TryActivateAbility(AbilitySpecHandle);
-		UE_LOG(LogRPG, Display, TEXT("ProcessAbilityInput: TryActivateAbility result = %s"), bActivated ? TEXT("SUCCESS") : TEXT("FAILED"));
+		TryActivateAbility(AbilitySpecHandle);
 	}
 
 	// ── 5. 处理释放的输入 (InputReleased 事件) ──
-	UE_LOG(LogRPG, Display, TEXT("ProcessAbilityInput: Processing %d Released inputs..."), InputReleasedSpecHandles.Num());
-	
 	for (const FGameplayAbilitySpecHandle& SpecHandle : InputReleasedSpecHandles)
 	{
 		if (FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(SpecHandle))
@@ -423,7 +406,6 @@ void URPGAbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool bGame
 
 				if (AbilitySpec->IsActive())
 				{
-					UE_LOG(LogRPG, Display, TEXT("ProcessAbilityInput: Ability [%s] active, sending InputReleased event"), *GetNameSafe(AbilitySpec->Ability));
 					// 能力已激活，传递 InputReleased 事件（如松开蓄力攻击释放）
 					AbilitySpecInputReleased(*AbilitySpec);
 				}
@@ -432,11 +414,8 @@ void URPGAbilitySystemComponent::ProcessAbilityInput(float DeltaTime, bool bGame
 	}
 
 	// ── 6. 清空本帧缓存 ──
-	UE_LOG(LogRPG, Display, TEXT("ProcessAbilityInput: Clearing input caches"));
 	InputPressedSpecHandles.Reset();
 	InputReleasedSpecHandles.Reset();
-	
-	UE_LOG(LogRPG, Display, TEXT("ProcessAbilityInput: Completed"));
 }
 
 // ============================================================================

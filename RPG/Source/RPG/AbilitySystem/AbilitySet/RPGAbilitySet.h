@@ -8,6 +8,7 @@
 #include "GameplayAbilitySpec.h"
 #include "ActiveGameplayEffectHandle.h"
 #include "AttributeSet.h"
+#include "../AttributeSystem/RPGAttributeInitTableRow.h"
 #include "RPGAbilitySet.generated.h"
 
 // 前置声明，避免循环依赖
@@ -16,6 +17,7 @@ class URPGGameplayAbility;
 class UGameplayEffect;
 class URPGGameplayAbility;
 class UGameplayEffect;
+class UDataTable;
 
 /**
  * FRPGAbilitySet_Ability

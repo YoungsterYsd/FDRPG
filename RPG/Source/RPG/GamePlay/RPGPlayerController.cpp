@@ -9,7 +9,7 @@
 #include "Blueprint/UserWidget.h"
 #include "RPGPlayerController.h"
 #include "RPGCharacter.h"
-#include "../AbilitySystem/RPGAbilitySystemComponent.h"
+#include "../AbilitySystem/Core/RPGAbilitySystemComponent.h"
 #include "../System/RPGLogChannels.h"
 
 ARPGPlayerController::ARPGPlayerController()

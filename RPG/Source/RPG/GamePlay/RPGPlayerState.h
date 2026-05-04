@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
 #include "AbilitySystemInterface.h"
+#include "../AbilitySystem/AbilitySet/RPGAbilitySet.h"
 #include "RPGPlayerState.generated.h"
 
 class URPGAbilitySystemComponent;
@@ -39,6 +40,9 @@ public:
 	/** 初始化 ASC 的 ActorInfo（绑定 PlayerState 自身作为 Owner，Pawn 作为 Avatar） */
 	void InitAbilityActorInfo(APawn* InPawn);
 
+	/** 撤销 AbilitySet（清理授予的内容） */
+	void RemoveAbilitySet();
+
 protected:
 
 	/** 创建 AbilitySystemComponent 的子组件（可选，这里直接在构造函数创建） */
@@ -51,6 +55,19 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponentForReplication;
+
+	// ========================================================================
+	// AbilitySet - 配置要授予的 AttributeSet 和初始化 GE
+	// ========================================================================
+	// 注意：单个 DefaultAbilitySet 已移除，改为使用 URPGCharacterConfig 全局配置
+	// 在 URPGGameInstance::ActiveCharacterConfig 中配置
+
+	// 记录授予的 Handle，用于精确撤销
+	// 现在使用 TArray 因为一个 Character 可能授予多个 AbilitySet
+	TArray<FRPGAbilitySet_GrantedHandles> GrantedHandlesList;
+
+	/** 根据 CharacterID 初始化技能和属性 */
+	void InitAbilitiesAndAttributes(FName CharacterID);
 
 	// ========================================================================
 	// Tag 关系映射（可选，在蓝图或 GameData 中配置）

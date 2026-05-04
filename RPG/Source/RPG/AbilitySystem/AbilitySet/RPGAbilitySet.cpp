@@ -1,9 +1,15 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "RPGAbilitySet.h"
-#include "RPGGameplayAbility.h"
-#include "RPGAbilitySystemComponent.h"
-#include "../System/RPGLogChannels.h"
+#include "../Core/RPGGameplayAbility.h"
+#include "../Core/RPGAbilitySystemComponent.h"
+#include "../AttributeSystem/RPGAttributeSet.h"
+#include "../AttributeSystem/RPGAttributeInitTableRow.h"
+#include "../../System/RPGLogChannels.h"
+
+#include "Engine/DataTable.h"
+#include "GameplayEffect.h"
+#include "AbilitySystemComponent.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RPGAbilitySet)
 

@@ -1,0 +1,54 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
+#include "RPGGameSettingRegistry.h"
+
+#include "GameSettingCollection.h"
+#include "EditCondition/WhenPlayingAsPrimaryPlayer.h"
+#include "EditCondition/WhenPlatformHasTrait.h"
+#include "CustomSettings/RPGSettingValueDiscrete_Language.h"
+#include "RPGSettingsLocal.h"
+#include "GameSettingValueDiscreteDynamic.h"
+#include "Player/RPGLocalPlayer.h"
+
+#define LOCTEXT_NAMESPACE "Lyra"
+
+UGameSettingCollection* URPGGameSettingRegistry::InitializeGameplaySettings(URPGLocalPlayer* InLocalPlayer)
+{
+	UGameSettingCollection* Screen = NewObject<UGameSettingCollection>();
+	Screen->SetDevName(TEXT("GameplayCollection"));
+	Screen->SetDisplayName(LOCTEXT("GameplayCollection_Name", "Gameplay"));
+	Screen->Initialize(InLocalPlayer);
+
+	{
+		UGameSettingCollection* LanguageSubsection = NewObject<UGameSettingCollection>();
+		LanguageSubsection->SetDevName(TEXT("LanguageCollection"));
+		LanguageSubsection->SetDisplayName(LOCTEXT("LanguageCollection_Name", "Language"));
+		Screen->AddSetting(LanguageSubsection);
+
+		//----------------------------------------------------------------------------------
+		{
+			URPGSettingValueDiscrete_Language* Setting = NewObject<URPGSettingValueDiscrete_Language>();
+			Setting->SetDevName(TEXT("Language"));
+			Setting->SetDisplayName(LOCTEXT("LanguageSetting_Name", "Language"));
+			Setting->SetDescriptionRichText(LOCTEXT("LanguageSetting_Description", "The language of the game."));
+			
+#if WITH_EDITOR
+			if (GIsEditor)
+			{
+				Setting->SetDescriptionRichText(LOCTEXT("LanguageSetting_WithEditor_Description", "The language of the game.\n\n<text color=\"#ffff00\">WARNING: Language changes will not affect PIE, you'll need to run with -game to test this, or change your PIE language options in the editor preferences.</>"));
+			}
+#endif
+			
+			Setting->AddEditCondition(FWhenPlayingAsPrimaryPlayer::Get());
+
+			LanguageSubsection->AddSetting(Setting);
+		}
+		//----------------------------------------------------------------------------------
+	}
+
+	// Replay Subsection 已裁剪（C1 Replays/ 移除）
+
+	return Screen;
+}
+
+#undef LOCTEXT_NAMESPACE

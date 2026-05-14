@@ -2,8 +2,8 @@
 
 #include "RPGPlayerState.h"
 
-#include "AbilitySystem/Attributes/RPGCombatSet.h"
 #include "AbilitySystem/Attributes/RPGHealthSet.h"
+#include "AbilitySystem/Attributes/RPGPrimaryAttributeSet.h"
 #include "AbilitySystem/RPGAbilitySet.h"
 #include "AbilitySystem/RPGAbilitySystemComponent.h"
 #include "Character/RPGPawnData.h"
@@ -37,7 +37,8 @@ ARPGPlayerState::ARPGPlayerState(const FObjectInitializer& ObjectInitializer)
 
 	// These attribute sets will be detected by AbilitySystemComponent::InitializeComponent. Keeping a reference so that the sets don't get garbage collected before that.
 	HealthSet = CreateDefaultSubobject<URPGHealthSet>(TEXT("HealthSet"));
-	CombatSet = CreateDefaultSubobject<URPGCombatSet>(TEXT("CombatSet"));
+	// A3 v7：RPG primary attribute set（URPGCombatSet 已于 A3-3 清理期废弃）
+	PrimaryAttributeSet = CreateDefaultSubobject<URPGPrimaryAttributeSet>(TEXT("PrimaryAttributeSet"));
 
 	// AbilitySystemComponent needs to be updated at a high frequency.
 	SetNetUpdateFrequency(100.0f);
@@ -112,11 +113,13 @@ void ARPGPlayerState::OnExperienceLoaded(const URPGExperienceDefinition* /*Curre
 	{
 		if (const URPGPawnData* NewPawnData = RPGGameMode->GetPawnDataForController(GetOwningController()))
 		{
+			UE_LOG(LogRPGAbilitySystem, Log, TEXT("[A2] PlayerState '%s' OnExperienceLoaded → SetPawnData('%s')"),
+				*GetNameSafe(this), *GetNameSafe(NewPawnData));
 			SetPawnData(NewPawnData);
 		}
 		else
 		{
-			UE_LOG(LogLyra, Error, TEXT("ALyraPlayerState::OnExperienceLoaded(): Unable to find PawnData to initialize player state [%s]!"), *GetNameSafe(this));
+			UE_LOG(LogRPGAbilitySystem, Error, TEXT("[A2] PlayerState '%s' OnExperienceLoaded: Unable to find PawnData!"), *GetNameSafe(this));
 		}
 	}
 }
@@ -200,13 +203,18 @@ void ARPGPlayerState::SetPawnData(const URPGPawnData* InPawnData)
 	MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, PawnData, this);
 	PawnData = InPawnData;
 
+	int32 GivenCount = 0;
 	for (const URPGAbilitySet* AbilitySet : PawnData->AbilitySets)
 	{
 		if (AbilitySet)
 		{
 			AbilitySet->GiveToAbilitySystem(AbilitySystemComponent, nullptr);
+			++GivenCount;
 		}
 	}
+
+	UE_LOG(LogRPGAbilitySystem, Log, TEXT("[A2] PlayerState '%s' SetPawnData('%s') → granted %d AbilitySet(s) to ASC '%s'"),
+		*GetNameSafe(this), *GetNameSafe(InPawnData), GivenCount, *GetNameSafe(AbilitySystemComponent));
 
 	UGameFrameworkComponentManager::SendGameFrameworkComponentExtensionEvent(this, NAME_RPGAbilityReady);
 	

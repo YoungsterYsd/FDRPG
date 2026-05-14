@@ -72,6 +72,61 @@ namespace RPGGameplayTags
 	// When extending Lyra, you can create your own movement modes but you need to update GetCustomMovementModeTagMap()
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Movement_Mode_Custom, "Movement.Mode.Custom", "This is invalid and should be replaced with custom tags.  See LyraGameplayTags::CustomMovementModeTagMap.");
 
+	// =====================================================================================
+	// === A3 v7 锁定：RPG GAS 属性 / SetByCaller / 战斗状态 / 消息 Tag 定义 ===
+	// =====================================================================================
+
+	// --- HealthSet 6 字段 ---
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Health_Final,            "RPG.Attribute.Health.Final",          "[A3] HealthSet.HealthFinal current HP value.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Health_Max,              "RPG.Attribute.Health.Max",            "[A3] HealthSet.HealthMax derived from PrimaryAttributes.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Health_Healing,          "RPG.Attribute.Health.Healing",        "[A3] HealthSet.HealthHealing meta channel.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Health_Damage,           "RPG.Attribute.Health.Damage",         "[A3] HealthSet.HealthDamage meta channel.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Stamina_Current,         "RPG.Attribute.Stamina.Current",       "[A3] HealthSet.StaminaCurrent (block durability).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Stamina_Max,             "RPG.Attribute.Stamina.Max",           "[A3] HealthSet.StaminaMax.");
+
+	// --- PrimaryAttributeSet 21 字段 ---
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Health_Base,             "RPG.Attribute.Health.Base",           "[A3] PrimaryAttributeSet.HealthBase (legacy: Hp_Basic).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Attack_Base,             "RPG.Attribute.Attack.Base",           "[A3] PrimaryAttributeSet.AttackBase (legacy: Atk_Basic).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Defense_Base,            "RPG.Attribute.Defense.Base",          "[A3] PrimaryAttributeSet.DefenseBase (legacy: Def_Basic).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Health_Bonus,            "RPG.Attribute.Health.Bonus",          "[A3] PrimaryAttributeSet.HealthBonus (legacy: Hp_PostAdd).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Attack_Bonus,            "RPG.Attribute.Attack.Bonus",          "[A3] PrimaryAttributeSet.AttackBonus (legacy: Atk_PostAdd).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Defense_Bonus,           "RPG.Attribute.Defense.Bonus",         "[A3] PrimaryAttributeSet.DefenseBonus (legacy: Def_PostAdd).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Health_Mul,              "RPG.Attribute.Health.Mul",            "[A3] PrimaryAttributeSet.HealthMul (legacy: Hp_Mul).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Attack_Mul,              "RPG.Attribute.Attack.Mul",            "[A3] PrimaryAttributeSet.AttackMul (legacy: Atk_Mul).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Defense_Mul,             "RPG.Attribute.Defense.Mul",           "[A3] PrimaryAttributeSet.DefenseMul (legacy: Def_Mul).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Attack_Final,            "RPG.Attribute.Attack.Final",          "[A3] PrimaryAttributeSet.AttackFinal (derived).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Defense_Final,           "RPG.Attribute.Defense.Final",         "[A3] PrimaryAttributeSet.DefenseFinal (derived).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Crit_Chance,             "RPG.Attribute.Crit.Chance",           "[A3] Crit chance probability (legacy: Crit).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Crit_Damage,             "RPG.Attribute.Crit.Damage",           "[A3] Crit damage multiplier (legacy: CritDmg).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Defense_Penetration,     "RPG.Attribute.Defense.Penetration",   "[A3] Defense penetration ratio (legacy: IgnDef).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Damage_Bonus,            "RPG.Attribute.Damage.Bonus",          "[A3] Damage output bonus (legacy: Dmg_Mul).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_Damage_Reduction,        "RPG.Attribute.Damage.Reduction",      "[A3] Damage taken reduction (legacy: DmgRed_Mul).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_LifeSteal,               "RPG.Attribute.LifeSteal",             "[A3] Life steal ratio (legacy: HealthSteal).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_EnergyGainMul,           "RPG.Attribute.EnergyGainMul",         "[A3] Energy gain multiplier (legacy: PowerRegenRate, see 02 §F.9).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_BreakBonus,              "RPG.Attribute.BreakBonus",            "[A3] Break (toughness) bonus.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_AttackSpeed,             "RPG.Attribute.AttackSpeed",           "[A3] Attack speed bonus (legacy: NormalSkillSpeed).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attribute_MoveSpeed,               "RPG.Attribute.MoveSpeed",             "[A3] Move speed (UE units/s).");
+
+	// --- SetByCaller ---
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(SetByCaller_Damage_Base,                  "RPG.SetByCaller.Damage.Base",                  "[A3] Base damage value passed via GE Spec.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(SetByCaller_Damage_AttackerScalingCoef,   "RPG.SetByCaller.Damage.AttackerScalingCoef",   "[A3] Coefficient applied to attacker's AttackFinal in damage formula.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(SetByCaller_Block_DamageReduction,        "RPG.SetByCaller.Block.DamageReduction",        "[A3] Block damage reduction (0..1) carried by GE_Block_State.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(SetByCaller_Block_StaminaConsume,         "RPG.SetByCaller.Block.StaminaConsume",         "[A3] Stamina cost ratio when blocking (cost = damage * this).");
+
+	// --- State ---
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Combat_Active,                "RPG.State.Combat.Active",              "[A3] Owner is in combat (set by URPGCombatStateSubsystem).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Block_Blocking,               "RPG.State.Block.Blocking",             "[A3] Owner is currently blocking (granted by GE_Block_State).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Block_PerfectBlocking,        "RPG.State.Block.PerfectBlocking",      "[A3] Owner is within perfect block window (set by Block GA timer).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Block_Broken,                 "RPG.State.Block.Broken",               "[A3] Owner's stamina ran out, block broken stun active.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Stamina_RegenOutOfCombat,     "RPG.State.Stamina.RegenOutOfCombat",   "[A3] Granted by GE_Stamina_Regen_OutOfCombat.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Stamina_RegenInCombat,        "RPG.State.Stamina.RegenInCombat",      "[A3] Granted by GE_Stamina_Regen_InCombat.");
+
+	// --- Message ---
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Message_Damage_Popup,               "RPG.Message.Damage.Popup",             "[A3] Broadcast by DamageExecution to drive damage number popup.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Message_Block_PerfectTriggered,     "RPG.Message.Block.PerfectTriggered",   "[A3] Broadcast when target perfectly blocks an attack.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Message_Block_Broken,               "RPG.Message.Block.Broken",             "[A3] Broadcast when StaminaCurrent reaches 0 during blocking.");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Message_Health_OutOfHealth,         "RPG.Message.Health.OutOfHealth",       "[A3] Broadcast when HealthFinal reaches 0.");
+
 	// Unreal Movement Modes
 	const TMap<uint8, FGameplayTag> MovementModeTagMap =
 	{

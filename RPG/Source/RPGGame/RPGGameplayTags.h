@@ -38,7 +38,8 @@ namespace RPGGameplayTags
 	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Ability_Block);         // Ctrl 格挡
 	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Ability_HealItem);      // H 使用恢复品
 
-	// === Lyra 残留：暂保留以兼容 HeroComponent 的 Bind 逻辑（A4 切俯视角后再决定是否清理）===
+	// === Lyra 残留：保留以兼容 HeroComponent 的 Bind 逻辑（A4 切俯视角后再决定是否清理）===
+	// [A4 待清理] 以下 4 个 InputTag 在 RPGHeroComponent.cpp 中 BindNativeAction，A4 俯视角改造时连同 LookMouse/LookStick/Crouch/AutoRun 输入处理一起删除
 	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Look_Mouse);
 	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Look_Stick);
 	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Crouch);
@@ -61,6 +62,7 @@ namespace RPGGameplayTags
 
 	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Crouching);
 	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_AutoRunning);
+	// [A4 待清理] Status_Crouching / Status_AutoRunning 为 Lyra 蹲伏/自动跑残留状态 Tag，A4 俯视角改造时一并删除（涉及 RPGCharacter::OnStartCrouch / RPGPlayerController::OnStartAutoRun）
 	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Death);
 	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Death_Dying);
 	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Death_Dead);
@@ -76,4 +78,67 @@ namespace RPGGameplayTags
 	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Movement_Mode_Flying);
 
 	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Movement_Mode_Custom);
+
+	// =====================================================================================
+	// === A3 v7 锁定：RPG GAS 属性 / SetByCaller / 战斗状态 / 消息 Tag ===
+	// 命名规范：[目标在前，修饰在后]，详见 14_后续日程与验收清单.md §3.1.2
+	// =====================================================================================
+
+	// --- A3 Attribute Tag（HealthSet 6 字段，AttributeBased / UMG 绑定用） ---
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Health_Final);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Health_Max);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Health_Healing);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Health_Damage);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Stamina_Current);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Stamina_Max);
+
+	// --- A3 Attribute Tag（PrimaryAttributeSet 21 字段） ---
+	// 组 1：基础三维（*Base）
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Health_Base);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Attack_Base);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Defense_Base);
+	// 组 2：加性加成（*Bonus）
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Health_Bonus);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Attack_Bonus);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Defense_Bonus);
+	// 组 3：百分比乘数（*Mul）
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Health_Mul);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Attack_Mul);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Defense_Mul);
+	// 组 4：汇总派生（*Final）—— MaxHealth 的派生写到 HealthSet
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Attack_Final);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Defense_Final);
+	// 组 5：战斗倍率
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Crit_Chance);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Crit_Damage);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Defense_Penetration);
+	// 组 6：伤害修正
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Damage_Bonus);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_Damage_Reduction);
+	// 组 7：特殊
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_LifeSteal);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_EnergyGainMul);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_BreakBonus);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_AttackSpeed);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attribute_MoveSpeed);
+
+	// --- A3 SetByCaller Tag（跨 GE/GA 传参） ---
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(SetByCaller_Damage_Base);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(SetByCaller_Damage_AttackerScalingCoef);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(SetByCaller_Block_DamageReduction);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(SetByCaller_Block_StaminaConsume);
+
+	// --- A3 State Tag（布尔状态） ---
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Combat_Active);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Block_Blocking);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Block_PerfectBlocking);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Block_Broken);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Stamina_RegenOutOfCombat);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Stamina_RegenInCombat);
+
+	// --- A3 Message Tag（GameplayMessage 广播） ---
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Damage_Popup);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Block_PerfectTriggered);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Block_Broken);
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Message_Health_OutOfHealth);
 };

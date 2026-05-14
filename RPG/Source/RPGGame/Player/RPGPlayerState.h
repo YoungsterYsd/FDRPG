@@ -155,9 +155,9 @@ private:
 	// Health attribute set used by this actor.
 	UPROPERTY()
 	TObjectPtr<const class URPGHealthSet> HealthSet;
-	// Combat attribute set used by this actor.
+	// === A3 v7：RPG primary attribute set (21 fields, see 14 §3.2.2) ===
 	UPROPERTY()
-	TObjectPtr<const class URPGCombatSet> CombatSet;
+	TObjectPtr<const class URPGPrimaryAttributeSet> PrimaryAttributeSet;
 
 	UPROPERTY(Replicated)
 	ERPGPlayerConnectionType MyPlayerConnectionType;

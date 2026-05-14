@@ -13,20 +13,32 @@
 class UObject;
 struct FFrame;
 
+// === Lyra 沿用：通用 Damage 流程 Tag（仍保留，DamageExecution 引用）===
 RPGGAME_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Gameplay_Damage);
 RPGGAME_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Gameplay_DamageImmunity);
 RPGGAME_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Gameplay_DamageSelfDestruct);
 RPGGAME_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Gameplay_FellOutOfWorld);
-RPGGAME_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Lyra_Damage_Message);
+RPGGAME_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_RPG_Damage_Message);
 
 struct FGameplayEffectModCallbackData;
 
-
 /**
- * ULyraHealthSet
+ * URPGHealthSet（A3 v7 锁定 · 6 字段瘦身版）
  *
- *	Class that defines attributes that are necessary for taking damage.
- *	Attribute examples include: health, shields, and resistances.
+ *   设计原则：AttributeSet = 纯数值状态 + Meta 通道。
+ *   字段命名：v7 后缀制，彻底废弃 Lyra 原生 Health/MaxHealth/Healing/Damage 命名。
+ *
+ *   字段：
+ *     - HealthFinal      当前血量值（钳制 [0, HealthMax]）
+ *     - HealthMax        最大血量（由 GE_Health_Derive_Max 持续派生写入）
+ *     - HealthHealing    Meta 通道：流入血量的治疗值（PostExecute 转 HealthFinal+ 后清零）
+ *     - HealthDamage     Meta 通道：流入血量的伤害值（PostExecute 转 HealthFinal- 后清零）
+ *     - StaminaCurrent   当前耐力（格挡耐久；钳制 [0, StaminaMax]；= 0 广播 Block.Broken）
+ *     - StaminaMax       最大耐力
+ *
+ *   初值：C++ 不硬编码，全部由 GE_HealthSet_Init / GE_Health_Derive_Max / GE_Health_Init_Full 赋予。
+ *
+ *   完整设计见 14_后续日程与验收清单.md §3.2.1 / §3.3
  */
 UCLASS(MinimalAPI, BlueprintType)
 class URPGHealthSet : public URPGAttributeSet
@@ -37,27 +49,33 @@ public:
 
 	UE_API URPGHealthSet();
 
-	ATTRIBUTE_ACCESSORS(URPGHealthSet, Health);
-	ATTRIBUTE_ACCESSORS(URPGHealthSet, MaxHealth);
-	ATTRIBUTE_ACCESSORS(URPGHealthSet, Healing);
-	ATTRIBUTE_ACCESSORS(URPGHealthSet, Damage);
+	ATTRIBUTE_ACCESSORS(URPGHealthSet, HealthFinal);
+	ATTRIBUTE_ACCESSORS(URPGHealthSet, HealthMax);
+	ATTRIBUTE_ACCESSORS(URPGHealthSet, HealthHealing);
+	ATTRIBUTE_ACCESSORS(URPGHealthSet, HealthDamage);
+	ATTRIBUTE_ACCESSORS(URPGHealthSet, StaminaCurrent);
+	ATTRIBUTE_ACCESSORS(URPGHealthSet, StaminaMax);
 
-	// Delegate when health changes due to damage/healing, some information may be missing on the client
+	// Delegate when HealthFinal changes due to damage/healing, some information may be missing on the client
 	mutable FRPGAttributeEvent OnHealthChanged;
 
-	// Delegate when max health changes
+	// Delegate when HealthMax changes
 	mutable FRPGAttributeEvent OnMaxHealthChanged;
 
-	// Delegate to broadcast when the health attribute reaches zero
+	// Delegate to broadcast when the HealthFinal attribute reaches zero
 	mutable FRPGAttributeEvent OnOutOfHealth;
+
+	// Delegate when StaminaCurrent reaches 0 (block broken)
+	mutable FRPGAttributeEvent OnBlockBroken;
 
 protected:
 
-	UFUNCTION()
-	UE_API void OnRep_Health(const FGameplayAttributeData& OldValue);
+	UFUNCTION() UE_API void OnRep_HealthFinal(const FGameplayAttributeData& OldValue);
+	UFUNCTION() UE_API void OnRep_HealthMax(const FGameplayAttributeData& OldValue);
+	UFUNCTION() UE_API void OnRep_StaminaCurrent(const FGameplayAttributeData& OldValue);
+	UFUNCTION() UE_API void OnRep_StaminaMax(const FGameplayAttributeData& OldValue);
 
-	UFUNCTION()
-	UE_API void OnRep_MaxHealth(const FGameplayAttributeData& OldValue);
+	UE_API virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UE_API virtual bool PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data) override;
 	UE_API virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
@@ -70,32 +88,42 @@ protected:
 
 private:
 
-	// The current health attribute.  The health will be capped by the max health attribute.  Health is hidden from modifiers so only executions can modify it.
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "RPG|Health", Meta = (HideFromModifiers, AllowPrivateAccess = true))
-	FGameplayAttributeData Health;
+	// === 当前血量（PostExecute 钳制 [0, HealthMax]；GE_Health_Init_Full 可 Override 写入）===
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_HealthFinal, Category = "RPG|Health", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData HealthFinal;
 
-	// The current max health attribute.  Max health is an attribute since gameplay effects can modify it.
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxHealth, Category = "RPG|Health", Meta = (AllowPrivateAccess = true))
-	FGameplayAttributeData MaxHealth;
+	// === 最大血量（GE Override 写入）===
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_HealthMax, Category = "RPG|Health", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData HealthMax;
 
-	// Used to track when the health reaches 0.
-	bool bOutOfHealth;
+	// === 当前耐力（格挡耐久；PostExecute 钳制 [0, StaminaMax]；GE_HealthSet_Init Override + Regen GE Add）===
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_StaminaCurrent, Category = "RPG|Stamina", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData StaminaCurrent;
 
-	// Store the health before any changes 
-	float MaxHealthBeforeAttributeChange;
-	float HealthBeforeAttributeChange;
+	// === 最大耐力 ===
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_StaminaMax, Category = "RPG|Stamina", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData StaminaMax;
 
-	// -------------------------------------------------------------------
-	//	Meta Attribute (please keep attributes that aren't 'stateful' below 
-	// -------------------------------------------------------------------
+	// === 状态追踪 ===
+	bool bOutOfHealth = false;
+	bool bBlockBroken = false;
 
-	// Incoming healing. This is mapped directly to +Health
-	UPROPERTY(BlueprintReadOnly, Category = "RPG|Health", Meta=(AllowPrivateAccess=true))
-	FGameplayAttributeData Healing;
+	// 用于在 PostExecute 中对比变化前后的值
+	float HealthBeforeAttributeChange = 0.0f;
+	float HealthMaxBeforeAttributeChange = 0.0f;
+	float StaminaBeforeAttributeChange = 0.0f;
 
-	// Incoming damage. This is mapped directly to -Health
-	UPROPERTY(BlueprintReadOnly, Category = "RPG|Health", Meta=(HideFromModifiers, AllowPrivateAccess=true))
-	FGameplayAttributeData Damage;
+	// =========================================================================
+	// Meta Attributes（事件通道，PostExecute 后立即清零）
+	// =========================================================================
+
+	// 流入治疗（→ +HealthFinal）
+	UPROPERTY(BlueprintReadOnly, Category = "RPG|Health", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData HealthHealing;
+
+	// 流入伤害（→ -HealthFinal）
+	UPROPERTY(BlueprintReadOnly, Category = "RPG|Health", Meta = (HideFromModifiers, AllowPrivateAccess = true))
+	FGameplayAttributeData HealthDamage;
 };
 
 #undef UE_API

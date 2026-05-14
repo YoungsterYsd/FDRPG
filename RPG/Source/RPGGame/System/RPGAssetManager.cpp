@@ -182,23 +182,12 @@ UPrimaryDataAsset* URPGAssetManager::LoadGameDataOfClass(TSubclassOf<UPrimaryDat
 	}
 	else
 	{
-		// Phase A2 资产大扫除：旧的 DefaultGameData 已删除，新建占位资产前的过渡期间，允许 GameData 缺席：
-		// 用 CDO 作为兜底，避免 Editor 启动时直接 Fatal（让主理人有机会进 Editor 创建新 GameData 资产）。
-		// 长期方案：DefaultGame.ini 必须配置 RPGGameDataPath 指向真实资产。
-		UE_LOG(LogLyra, Warning,
-			TEXT("Failed to load GameData asset at [%s] of type [%s]. Falling back to %s CDO. "
-			     "This is acceptable during Phase A2 asset cleanup transition. Long-term: configure RPGGameDataPath in DefaultGame.ini."),
-			*DataClassPath.ToString(), *PrimaryAssetType.ToString(), *DataClass->GetName());
-		Asset = GetMutableDefault<UPrimaryDataAsset>(DataClass.Get());
-		if (Asset)
-		{
-			GameDataMap.Add(DataClass, Asset);
-		}
-		else
-		{
-			// 真的拿不到 CDO（DataClass 为空），保留原 Fatal 行为
-			UE_LOG(LogLyra, Fatal, TEXT("Failed to load GameData asset at %s. Type %s. This is not recoverable and likely means you do not have the correct data to run %s."), *DataClassPath.ToString(), *PrimaryAssetType.ToString(), FApp::GetProjectName());
-		}
+		// 配置错误暴露：GameData 资产必须存在（A3 起 DA_RPG_GameData_Default 已就位）。
+		// 如果走到这里，说明 DefaultGame.ini 的 RPGGameDataPath 写错或资产被删除 —— 立即 Fatal 让问题可见。
+		UE_LOG(LogLyra, Fatal,
+			TEXT("Failed to load GameData asset at %s. Type %s. Check DefaultGame.ini → [/Script/RPGGame.RPGAssetManager] RPGGameDataPath, "
+			     "and make sure the asset exists in Content. This is not recoverable."),
+			*DataClassPath.ToString(), *PrimaryAssetType.ToString());
 	}
 
 	return Asset;

@@ -2,31 +2,14 @@
 
 #include "RPGHealExecution.h"
 #include "AbilitySystem/Attributes/RPGHealthSet.h"
-#include "AbilitySystem/Attributes/RPGCombatSet.h"
+#include "RPGGameplayTags.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RPGHealExecution)
 
 
-struct FHealStatics
-{
-	FGameplayEffectAttributeCaptureDefinition BaseHealDef;
-
-	FHealStatics()
-	{
-		BaseHealDef = FGameplayEffectAttributeCaptureDefinition(URPGCombatSet::GetBaseHealAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
-	}
-};
-
-static FHealStatics& HealStatics()
-{
-	static FHealStatics Statics;
-	return Statics;
-}
-
-
 URPGHealExecution::URPGHealExecution()
 {
-	RelevantAttributesToCapture.Add(HealStatics().BaseHealDef);
+	// A3 v7：不再 Capture CombatSet.BaseHeal，治疗量改由 GE Spec SetByCaller 传入（RPG.SetByCaller.Heal）
 }
 
 void URPGHealExecution::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
@@ -34,23 +17,15 @@ void URPGHealExecution::Execute_Implementation(const FGameplayEffectCustomExecut
 #if WITH_SERVER_CODE
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
 
-	const FGameplayTagContainer* SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
-	const FGameplayTagContainer* TargetTags = Spec.CapturedTargetTags.GetAggregatedTags();
-
-	FAggregatorEvaluateParameters EvaluateParameters;
-	EvaluateParameters.SourceTags = SourceTags;
-	EvaluateParameters.TargetTags = TargetTags;
-
-	float BaseHeal = 0.0f;
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(HealStatics().BaseHealDef, EvaluateParameters, BaseHeal);
+	// A3 v7：治疗量由调用方通过 SetByCaller 注入 —— 删除 URPGCombatSet 后的新管道
+	const float BaseHeal = Spec.GetSetByCallerMagnitude(RPGGameplayTags::SetByCaller_Heal, /*WarnIfNotFound=*/ false, /*DefaultIfNotFound=*/ 0.0f);
 
 	const float HealingDone = FMath::Max(0.0f, BaseHeal);
 
 	if (HealingDone > 0.0f)
 	{
-		// Apply a healing modifier, this gets turned into + health on the target
-		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(URPGHealthSet::GetHealingAttribute(), EGameplayModOp::Additive, HealingDone));
+		// Apply a healing modifier, this gets turned into + HealthFinal on the target via HealthSet::PostGameplayEffectExecute
+		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(URPGHealthSet::GetHealthHealingAttribute(), EGameplayModOp::Additive, HealingDone));
 	}
 #endif // #if WITH_SERVER_CODE
 }
-

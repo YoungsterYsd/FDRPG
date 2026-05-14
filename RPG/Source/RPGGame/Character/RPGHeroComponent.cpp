@@ -162,6 +162,9 @@ void URPGHeroComponent::HandleChangeInitState(UGameFrameworkComponentManager* Ma
 			// The player state holds the persistent data for this player (state that persists across deaths and multiple pawns).
 			// The ability system component and attribute sets live on the player state.
 			PawnExtComp->InitializeAbilitySystem(RPGPS->GetRPGAbilitySystemComponent(), RPGPS);
+
+			UE_LOG(LogRPGAbilitySystem, Log, TEXT("[HeroComponent] '%s' initialized AbilitySystem (Pawn='%s', PS='%s', PawnData='%s')"),
+				*GetNameSafe(this), *GetNameSafe(Pawn), *GetNameSafe(RPGPS), *GetNameSafe(PawnData));
 		}
 
 		if (ARPGPlayerController* RPGPC = GetController<ARPGPlayerController>())

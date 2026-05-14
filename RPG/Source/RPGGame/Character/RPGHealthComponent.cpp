@@ -80,12 +80,12 @@ void URPGHealthComponent::InitializeWithAbilitySystem(URPGAbilitySystemComponent
 	HealthSet->OnOutOfHealth.AddUObject(this, &ThisClass::HandleOutOfHealth);
 
 	// TEMP: Reset attributes to default values.  Eventually this will be driven by a spread sheet.
-	AbilitySystemComponent->SetNumericAttributeBase(URPGHealthSet::GetHealthAttribute(), HealthSet->GetMaxHealth());
+	AbilitySystemComponent->SetNumericAttributeBase(URPGHealthSet::GetHealthFinalAttribute(), HealthSet->GetHealthMax());
 
 	ClearGameplayTags();
 
-	OnHealthChanged.Broadcast(this, HealthSet->GetHealth(), HealthSet->GetHealth(), nullptr);
-	OnMaxHealthChanged.Broadcast(this, HealthSet->GetHealth(), HealthSet->GetHealth(), nullptr);
+	OnHealthChanged.Broadcast(this, HealthSet->GetHealthFinal(), HealthSet->GetHealthFinal(), nullptr);
+	OnMaxHealthChanged.Broadcast(this, HealthSet->GetHealthFinal(), HealthSet->GetHealthFinal(), nullptr);
 }
 
 void URPGHealthComponent::UninitializeFromAbilitySystem()
@@ -114,20 +114,20 @@ void URPGHealthComponent::ClearGameplayTags()
 
 float URPGHealthComponent::GetHealth() const
 {
-	return (HealthSet ? HealthSet->GetHealth() : 0.0f);
+	return (HealthSet ? HealthSet->GetHealthFinal() : 0.0f);
 }
 
 float URPGHealthComponent::GetMaxHealth() const
 {
-	return (HealthSet ? HealthSet->GetMaxHealth() : 0.0f);
+	return (HealthSet ? HealthSet->GetHealthMax() : 0.0f);
 }
 
 float URPGHealthComponent::GetHealthNormalized() const
 {
 	if (HealthSet)
 	{
-		const float Health = HealthSet->GetHealth();
-		const float MaxHealth = HealthSet->GetMaxHealth();
+		const float Health = HealthSet->GetHealthFinal();
+		const float MaxHealth = HealthSet->GetHealthMax();
 
 		return ((MaxHealth > 0.0f) ? (Health / MaxHealth) : 0.0f);
 	}

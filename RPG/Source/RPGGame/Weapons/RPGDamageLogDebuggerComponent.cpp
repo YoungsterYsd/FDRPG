@@ -9,7 +9,7 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(RPGDamageLogDebuggerComponent)
 
-UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Lyra_Damage_Message);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_RPG_Damage_Message);
 
 URPGDamageLogDebuggerComponent::URPGDamageLogDebuggerComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -23,7 +23,7 @@ void URPGDamageLogDebuggerComponent::BeginPlay()
 	Super::BeginPlay();
 
 	UGameplayMessageSubsystem& MessageSubsystem = UGameplayMessageSubsystem::Get(this);
-	ListenerHandle = MessageSubsystem.RegisterListener(TAG_Lyra_Damage_Message, this, &ThisClass::OnDamageMessage);
+	ListenerHandle = MessageSubsystem.RegisterListener(TAG_RPG_Damage_Message, this, &ThisClass::OnDamageMessage);
 }
 
 void URPGDamageLogDebuggerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)

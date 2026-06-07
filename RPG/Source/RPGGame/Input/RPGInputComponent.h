@@ -13,9 +13,15 @@ class UObject;
 
 
 /**
- * ULyraInputComponent
+ * URPGInputComponent — 输入绑定执行层
  *
- *	Component used to manage input mappings and bindings using an input config data asset.
+ * 继承自 UEnhancedInputComponent，是配置（URPGInputConfig）到执行（C++ 回调）的桥梁。
+ * 核心职责：
+ * - 从 InputConfig 资产中读取 InputAction→GameplayTag 映射表
+ * - 通过模板方法 BindNativeAction / BindAbilityActions 调用引擎 BindAction API
+ * - 将 Enhanced Input 的 Triggered/Completed 事件绑定到 HeroComponent 的回调函数
+ *
+ * 本类本身不包含业务逻辑，所有绑定策略由调用方（URPGHeroComponent）决定。
  */
 UCLASS(Config = Input)
 class URPGInputComponent : public UEnhancedInputComponent

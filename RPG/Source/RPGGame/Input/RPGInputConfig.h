@@ -12,9 +12,11 @@ class UObject;
 struct FFrame;
 
 /**
- * FLyraInputAction
+ * FRPGInputAction — 单条输入映射记录
  *
- *	Struct used to map a input action to a gameplay input tag.
+ * 承载一个 UInputAction 资产指针与对应的 FGameplayTag，
+ * 是 URPGInputConfig 映射表的基本组成单元。
+ * 分为两类用途：NativeInputActions（移动/视角等手动绑定）和 AbilityInputActions（技能自动绑定）。
  */
 USTRUCT(BlueprintType)
 struct FRPGInputAction
@@ -31,9 +33,13 @@ public:
 };
 
 /**
- * ULyraInputConfig
+ * URPGInputConfig — 输入映射配置资产（不可变 DataAsset）
  *
- *	Non-mutable data asset that contains input configuration properties.
+ * 定义 InputAction 与 GameplayTag 的对应关系，是输入系统的配置中心。
+ * - NativeInputActions：手动绑定的原生输入（移动/视角/蹲下等），由 URPGInputComponent::BindNativeAction 消费
+ * - AbilityInputActions：技能输入映射，由 URPGInputComponent::BindAbilityActions 自动绑定到 GA 的 InputTag
+ *
+ * 本 DataAsset 在 PawnData 中引用，HeroComponent 初始化时加载。
  */
 UCLASS(BlueprintType, Const)
 class URPGInputConfig : public UDataAsset
@@ -49,18 +55,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "RPG|Pawn")
 	const UInputAction* FindAbilityInputActionForTag(const FGameplayTag& InputTag, bool bLogNotFound = true) const;
-
-	/** A2 工具用：从 Python/BP 里向 NativeInputActions 数组追加一条映射（接收 FName 形式 Tag 以便 Python 调用） */
-	UFUNCTION(BlueprintCallable, CallInEditor, Category = "RPG|Tools")
-	void AddNativeMapping(const UInputAction* InputAction, FName InputTagName);
-
-	/** A2 工具用：同上，向 AbilityInputActions 数组追加一条映射 */
-	UFUNCTION(BlueprintCallable, CallInEditor, Category = "RPG|Tools")
-	void AddAbilityMapping(const UInputAction* InputAction, FName InputTagName);
-
-	/** A2 工具用：清空两个数组（重新生成前调用） */
-	UFUNCTION(BlueprintCallable, CallInEditor, Category = "RPG|Tools")
-	void ClearAllMappings();
 
 public:
 	// List of input actions used by the owner.  These input actions are mapped to a gameplay tag and must be manually bound.

@@ -46,25 +46,3 @@ const UInputAction* URPGInputConfig::FindAbilityInputActionForTag(const FGamepla
 
 	return nullptr;
 }
-
-void URPGInputConfig::AddNativeMapping(const UInputAction* InputAction, FName InputTagName)
-{
-	FRPGInputAction NewEntry;
-	NewEntry.InputAction = InputAction;
-	NewEntry.InputTag    = FGameplayTag::RequestGameplayTag(InputTagName, /*ErrorIfNotFound=*/false);
-	NativeInputActions.Add(NewEntry);
-}
-
-void URPGInputConfig::AddAbilityMapping(const UInputAction* InputAction, FName InputTagName)
-{
-	FRPGInputAction NewEntry;
-	NewEntry.InputAction = InputAction;
-	NewEntry.InputTag    = FGameplayTag::RequestGameplayTag(InputTagName, /*ErrorIfNotFound=*/false);
-	AbilityInputActions.Add(NewEntry);
-}
-
-void URPGInputConfig::ClearAllMappings()
-{
-	NativeInputActions.Empty();
-	AbilityInputActions.Empty();
-}

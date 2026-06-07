@@ -4,15 +4,19 @@
 
 #include "UserSettings/EnhancedInputUserSettings.h"
 #include "PlayerMappableKeySettings.h"
-
 #include "RPGInputUserSettings.generated.h"
 
 #define UE_API RPGGAME_API
 
 /** 
- * Custom settings class for any input related settings for the Lyra game.
- * This will be serialized out at the same time as the Lyra Shared Settings and is
- * compatible with cloud saves through by calling the "Serialize" function.
+ * URPGInputUserSettings — 玩家按键自定义设置的序列化容器
+ *
+ * 继承自 UEnhancedInputUserSettings，负责存储玩家在设置菜单中修改的按键绑定。
+ * - 所有 UPROPERTY(SaveGame) 标记的属性通过 SaveGame 系统自动持久化到磁盘
+ * - ApplySettings() 由 URPGSettingsShared::ApplySettings() 链式调用，使自定义映射全局生效
+ * - 支持云存档同步（通过 URPGSettingsShared 的序列化流程）
+ *
+ * 扩展点：可在此类中添加"长按时间阈值""Toggle vs Hold 偏好"等自定义输入设置属性。
  */
 UCLASS(MinimalAPI)
 class URPGInputUserSettings : public UEnhancedInputUserSettings
@@ -23,21 +27,18 @@ public:
 	UE_API virtual void ApplySettings() override;
 	//~ End UEnhancedInputUserSettings interface
 
-	// Add any additional Input Settings here!
-	// Some ideas could be:
-	// - "toggle vs. hold" to trigger in game actions
-	// - aim sensitivity should go here
-	// - etc
-
-	// Make sure to mark your properties with the "SaveGame" metadata to have them serialize when saved
-	//UPROPERTY(SaveGame, BlueprintReadWrite, Category="Enhanced Input|User Settings")
-	// bool bSomeExampleProperty;
+	/*
+	 * 扩展点：如需添加自定义输入设置属性，在此声明并标记 UPROPERTY(SaveGame)。
+	 * 示例：Toggle vs Hold 偏好、长按时间阈值、瞄准灵敏度等。
+	 */
 };
 
 /**
- * Player Mappable Key settings are settings that are accessible per-action key mapping.
- * This is where you could place additional metadata that may be used by your settings UI,
- * input triggers, or other places where you want to know about a key setting.
+ * URPGPlayerMappableKeySettings — 单个按键的元数据
+ *
+ * 附加在每个 UInputAction 资产上（PlayerMappableKeySettings 属性）。
+ * 为设置 UI 提供 Tooltip 等展示文本，例如"跳跃""使用物品""打开背包"。
+ * 当玩家在设置界面浏览可改键的 Action 列表时，UI 通过 GetTooltipText() 获取说明文字。
  */
 UCLASS(MinimalAPI)
 class URPGPlayerMappableKeySettings : public UPlayerMappableKeySettings

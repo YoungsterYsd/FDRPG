@@ -52,9 +52,12 @@ ARPGCharacter::ARPGCharacter(const FObjectInitializer& ObjectInitializer)
 	RPGMoveComp->BrakingFriction = 6.0f;
 	RPGMoveComp->GroundFriction = 8.0f;
 	RPGMoveComp->BrakingDecelerationWalking = 1400.0f;
+	// === A4 v1：俯视角配置 ===
+	// 02 §1 锁定"移动方向 = 朝向"——CharacterMovement 自动把 Pawn Yaw 转向 Velocity 方向。
+	// 相机走 URPGCameraMode_TopDown（固定 Pitch/Yaw），Pawn 不跟随 ControlRotation。
 	RPGMoveComp->bUseControllerDesiredRotation = false;
-	RPGMoveComp->bOrientRotationToMovement = false;
-	RPGMoveComp->RotationRate = FRotator(0.0f, 720.0f, 0.0f);
+	RPGMoveComp->bOrientRotationToMovement = true;
+	RPGMoveComp->RotationRate = FRotator(0.0f, 720.0f, 0.0f);  // 720°/s 平滑转向（约 0.5s 转 360°）
 	RPGMoveComp->bAllowPhysicsRotationDuringAnimRootMotion = false;
 	RPGMoveComp->GetNavAgentPropertiesRef().bCanCrouch = true;
 	RPGMoveComp->bCanWalkOffLedgesWhenCrouching = true;
@@ -71,8 +74,10 @@ ARPGCharacter::ARPGCharacter(const FObjectInitializer& ObjectInitializer)
 	CameraComponent = CreateDefaultSubobject<URPGCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetRelativeLocation(FVector(-300.0f, 0.0f, 75.0f));
 
+	// === A4 v1：俯视角下 Pawn 不跟随 Controller Yaw ===
+	// （旋转交给 CharacterMovement.bOrientRotationToMovement 处理）
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = true;
+	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
 	BaseEyeHeight = 80.0f;

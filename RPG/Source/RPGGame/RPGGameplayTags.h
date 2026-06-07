@@ -26,6 +26,8 @@ namespace RPGGameplayTags
 	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Native_SwitchWeapon);   // Tab 切换主副手
 	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Native_OpenMenu);       // Esc 打开主菜单
 	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Native_OpenInventory);  // I   打开背包
+	// === A4 新增：俯视角相机滚轮缩放 ===
+	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Native_CameraZoom);     // 鼠标滚轮（A4 TopDown）
 
 	// 战斗能力输入（AbilityInputActions，自动绑定到 GameplayAbility）
 	RPGGAME_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Ability_Attack);        // 鼠标左键 / A 主手普攻

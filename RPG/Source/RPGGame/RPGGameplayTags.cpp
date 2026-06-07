@@ -21,9 +21,11 @@ namespace RPGGameplayTags
 	// === A2 锁定：14 个 RPG InputAction 对应的 InputTag ===
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Move,                  "InputTag.Move",                  "Move input (Arrow keys / WASD).");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Native_Pickup,         "InputTag.Native.Pickup",         "Pickup / interact (F).");
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Native_SwitchWeapon,   "InputTag.Native.SwitchWeapon",   "Switch main/off-hand weapon (Tab).");
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Native_OpenMenu,       "InputTag.Native.OpenMenu",       "Open main menu / pause (Esc).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Native_SwitchWeapon,   "InputTag.Native.SwitchWeapon",   "Swap primary/offhand weapon (Tab).");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Native_OpenMenu,       "InputTag.Native.OpenMenu",       "Open main menu (Esc).");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Native_OpenInventory,  "InputTag.Native.OpenInventory",  "Open inventory (I).");
+	// === A4 新增：俯视角相机滚轮缩放 ===
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Native_CameraZoom,     "InputTag.Native.CameraZoom",     "Mouse wheel camera zoom (TopDown camera).");
 
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Ability_Attack,        "InputTag.Ability.Attack",        "Main-hand basic attack (Mouse Left / A).");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Ability_Q,             "InputTag.Ability.Q",             "Main-hand skill 1 (Q).");

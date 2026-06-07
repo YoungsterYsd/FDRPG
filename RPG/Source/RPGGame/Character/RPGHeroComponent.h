@@ -87,6 +87,9 @@ protected:
 	UE_API void Input_Crouch(const FInputActionValue& InputActionValue);
 	UE_API void Input_AutoRun(const FInputActionValue& InputActionValue);
 
+	/** A4 新增：俯视角相机滚轮缩放（IA_CameraZoom，1D Axis Float）。 */
+	UE_API void Input_CameraZoom(const FInputActionValue& InputActionValue);
+
 	UE_API TSubclassOf<URPGCameraMode> DetermineCameraMode() const;
 
 protected:

@@ -46,6 +46,17 @@ public:
 	// Add an offset to the field of view.  The offset is only for one frame, it gets cleared once it is applied.
 	void AddFieldOfViewOffset(float FovOffset) { FieldOfViewOffset += FovOffset; }
 
+	/** A4 新增：累加待消费的 ZoomDelta（俯视角相机用，由 IA_CameraZoom 调用，TopDownCameraMode 在 UpdateView 内消费）。 */
+	void AddPendingZoomDelta(float ZoomDelta) { PendingZoomDelta += ZoomDelta; }
+
+	/** A4 新增：消费并清零待处理的 ZoomDelta（在 CameraMode UpdateView 内调）。 */
+	float ConsumePendingZoomDelta()
+	{
+		const float Out = PendingZoomDelta;
+		PendingZoomDelta = 0.0f;
+		return Out;
+	}
+
 	virtual void DrawDebug(UCanvas* Canvas) const;
 
 	// Gets the tag associated with the top layer and the blend weight of it
@@ -66,5 +77,8 @@ protected:
 
 	// Offset applied to the field of view.  The offset is only for one frame, it gets cleared once it is applied.
 	float FieldOfViewOffset;
+
+	/** A4 新增：累加的 ZoomDelta，由 TopDownCameraMode UpdateView 内调 ConsumePendingZoomDelta() 取走。 */
+	float PendingZoomDelta = 0.0f;
 
 };

@@ -290,6 +290,8 @@ void URPGHeroComponent::InitializePlayerInput(UInputComponent* PlayerInputCompon
 					RPGIC->BindNativeAction(InputConfig, RPGGameplayTags::InputTag_Look_Stick, ETriggerEvent::Triggered, this, &ThisClass::Input_LookStick, /*bLogIfNotFound=*/ false);
 					RPGIC->BindNativeAction(InputConfig, RPGGameplayTags::InputTag_Crouch, ETriggerEvent::Triggered, this, &ThisClass::Input_Crouch, /*bLogIfNotFound=*/ false);
 					RPGIC->BindNativeAction(InputConfig, RPGGameplayTags::InputTag_AutoRun, ETriggerEvent::Triggered, this, &ThisClass::Input_AutoRun, /*bLogIfNotFound=*/ false);
+					// A4 新增：俯视角相机滚轮缩放
+					RPGIC->BindNativeAction(InputConfig, RPGGameplayTags::InputTag_Native_CameraZoom, ETriggerEvent::Triggered, this, &ThisClass::Input_CameraZoom, /*bLogIfNotFound=*/ false);
 				}
 			}
 		}
@@ -469,6 +471,32 @@ void URPGHeroComponent::Input_AutoRun(const FInputActionValue& InputActionValue)
 			Controller->SetIsAutoRunning(!Controller->GetIsAutoRunning());
 		}	
 	}
+}
+
+void URPGHeroComponent::Input_CameraZoom(const FInputActionValue& InputActionValue)
+{
+	// 鼠标滚轮 1D 轴：正值 = 拉远，负值 = 拉近（IMC 里可用 Negate 翻转手感）。
+	const float Delta = InputActionValue.Get<float>();
+	if (FMath::IsNearlyZero(Delta))
+	{
+		return;
+	}
+
+	APawn* Pawn = GetPawn<APawn>();
+	if (!Pawn)
+	{
+		return;
+	}
+
+	URPGCameraComponent* CameraComp = URPGCameraComponent::FindCameraComponent(Pawn);
+	if (!CameraComp)
+	{
+		return;
+	}
+
+	// 把 ZoomDelta 累加到 CameraComponent，由 URPGCameraMode_TopDown 在下一次 UpdateView 内消费。
+	// ScrollSpeed = 100（每滚一格 100cm 距离变化），由 CameraMode 内 Min/Max 钳制
+	CameraComp->AddPendingZoomDelta(Delta * 100.0f);
 }
 
 TSubclassOf<URPGCameraMode> URPGHeroComponent::DetermineCameraMode() const
